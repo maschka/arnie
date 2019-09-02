@@ -2,7 +2,7 @@ import os, re
 import subprocess as sp
 import random, string
 import numpy as np
-import package_toolkit.settings as settings
+import settings
 
 
 def write_vector_to_file(vector, outfile):

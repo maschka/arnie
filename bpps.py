@@ -2,9 +2,9 @@ import os, re, sys
 import subprocess as sp
 import random, string
 import numpy as np
-from package_toolkit.utils import *
-import package_toolkit.pfunc as pfunc
-import package_toolkit.settings as settings
+from utils import *
+import pfunc
+import settings
 
 DEBUG=False
 

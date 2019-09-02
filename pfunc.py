@@ -2,9 +2,8 @@ import os, re, sys
 import subprocess as sp
 import random, string
 import numpy as np
-
-from package_toolkit.utils import *
-import package_toolkit.settings as settings
+from utils import *
+import settings
 
 DEBUG=False
 
