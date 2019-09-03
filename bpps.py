@@ -179,7 +179,7 @@ def bpps_rnastructure_(sequence, tmp_file, coaxial=True):
 def bpps_vfold_(sequence, version='0',T=37, coaxial=True):
     #available versions: 0 for Turner 04 params, 1 for Mfold 2.3 params
 
-    DIR = package_locs["vfold_0"]
+    DIR = package_locs["vfold"]
 
     cwd = os.getcwd()
     os.chdir(DIR) #vfold precompiled binaries don't work being called from elsewhere
@@ -190,7 +190,16 @@ def bpps_vfold_(sequence, version='0',T=37, coaxial=True):
 
     outfile = filename()+'.pij'
 
-    command = ['./Vfold2d_npk_mac.o %d %d %s %s %d' % (int(coaxial), T, seqfile, outfile, int(version))]
+    if sys.platform=="linux":
+        platform='linux'
+    elif sys.platform=="darwin":
+        platform='mac'
+    elif sys.platform=="win32":
+        platform='win'
+    else:
+        raise RuntimeError('Vfold has binaries for linux, macOS, and win')
+
+    command = ['./Vfold2d_npk_%s.o %d %d %s %s %d' % (platform, int(coaxial), T, seqfile, outfile, int(version))]
 
     if DEBUG: print(' '.join(command))
 
@@ -205,7 +214,7 @@ def bpps_vfold_(sequence, version='0',T=37, coaxial=True):
         print('stderr')
         print(stderr)
     if p.returncode:
-        raise Exception('VfoldThermal_npk failed: on %s\n%s' % (seq, stderr))
+        raise Exception('Vfold2d_npk failed: on %s\n%s' % (sequence, stderr))
 
     os.remove(seqfile)
     probs = np.zeros([len(sequence),len(sequence)])

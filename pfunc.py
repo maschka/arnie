@@ -347,7 +347,7 @@ def pfunc_vfold_(seq, version='0', T=37, coaxial=True, bpps=False):
         # command = ['%s/Vfold2d_npk_mac.o %d %d %s %s %d' % (DIR, int(coaxial),\
         #  T, infile, outfile, int(version))]
 
-    DIR = package_locs["vfold_0"]
+    DIR = package_locs["vfold"]
 
     cwd = os.getcwd()
     os.chdir(DIR) #vfold precompiled binaries don't work being called from elsewhere
@@ -356,7 +356,17 @@ def pfunc_vfold_(seq, version='0', T=37, coaxial=True, bpps=False):
 
     seqfile = write([seq])
 
-    command = ['./VfoldThermal_npk_mac.o %d %d %d %s tmp %d; cat tmp; rm tmp' % (int(coaxial), T, T, seqfile, int(version))]
+    if sys.platform=="linux":
+        platform='linux'
+    elif sys.platform=="darwin":
+        platform='mac'
+    elif sys.platform=="win32":
+        platform='win'
+    else:
+        raise RuntimeError('Vfold has binaries for linux, macOS, and win')
+
+
+    command = ['./VfoldThermal_npk_%s.o %d %d %d %s tmp %d; cat tmp; rm tmp' % (platform, int(coaxial), T, T, seqfile, int(version))]
 
     if DEBUG: print(' '.join(command))
 
