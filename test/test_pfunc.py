@@ -1,6 +1,5 @@
 import pfunc
-import settings
-
+from utils import load_package_locations_from_yaml
 sample_seq = 'GGGGAAAACCCC'
 
 def test_pkg(package):
@@ -16,7 +15,8 @@ def test_pkg_w_bpps(package):
 	return
 
 if __name__=='__main__':
-	for pkg in sorted(settings.LOC.keys()):
+	package_locs = load_package_locations_from_yaml('user_default.yaml')
+	for pkg in sorted(package_locs.keys()):
 		if pkg=='TMP':
 			continue
 		test_pkg(pkg.lower())

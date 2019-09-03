@@ -2,23 +2,29 @@ import os, re, sys
 import subprocess as sp
 import random, string
 import numpy as np
-from utils import *
-import pfunc
-import settings
+from .utils import *
+from .pfunc import pfunc
 
 DEBUG=False
 
-def bpps(sequence, package='vienna', constraint=None, T=37, coaxial=False):
-    '''Compute base pairing probability matrix for sequence.
+# load package locations from yaml file, watch! global dict
+package_locs = load_package_locations_from_yaml('user_default.yaml')
+
+def bpps(sequence, package='vienna', constraint=None, T=37, coaxial=True, dangles=True):
+    ''' Compute base pairing probability matrix for RNA sequence.
 
     Args:
     sequence (str): nucleic acid sequence
-    T (float): temperature
-    constraint (str): structure constraint
+    T (float): temperature (Celsius)
+    constraint (str): structure constraint (functional in vienna, contrafold, rnastructure)
     motif (str): argument to vienna motif
-    coaxial (for vfold): True or false
+    dangles (bool): dangles or not, specifiable for vienna, nupack
+    coaxial (bool): coaxial stacking or not, specifiable for rnastructure, vfold
+    noncanonical(bool): include noncanonical pairs or not (for contrafold, RNAstructure (Cyclefold))
 
-  Returns
+    Possible packages: 'vienna_2', 'vienna_1','contrafold_1','contrafold_2','nupack_95','nupack_99','rnasoft_2007','rnasoft_1999','rnastructure','vfold_0','vfold_1'
+ 
+    Returns
     array: NxN matrix of base pair probabilities
   '''
     try:
@@ -26,12 +32,17 @@ def bpps(sequence, package='vienna', constraint=None, T=37, coaxial=False):
     except:
         pkg, version = package, None
 
-    if 'nupack' in package:
-        return bpps_nupack_(sequence, version = version, T = T)
-    elif 'vfold' in package:
+    if not dangles and pkg not in ['vienna','nupack']:
+        print('Warning: %s does not support dangles options' % pkg)
+    if not coaxial and pkg not in ['rnastructure','vfold']:
+        print('Warning: %s does not support coaxial options' % pkg)
+
+    if pkg=='nupack':
+        return bpps_nupack_(sequence, version = version, dangles = dangles, T = T)
+    elif pkg=='vfold':
     	return bpps_vfold_(sequence, version = version, T = T, coaxial = coaxial)
     else:
-        _, tmp_file = pfunc.pfunc(sequence, package=package, bpps=True, constraint=constraint, T=T)
+        _, tmp_file = pfunc(sequence, package=package, bpps=True, constraint=constraint, T=T, coaxial=coaxial, dangles=dangles)
         if 'contrafold' in package:
             return bpps_contrafold_(sequence, tmp_file)
         elif 'vienna' in package:
@@ -39,7 +50,7 @@ def bpps(sequence, package='vienna', constraint=None, T=37, coaxial=False):
         elif 'rnasoft' in package:
             return bpps_rnasoft_(sequence, tmp_file)
         elif 'rnastructure' in package:
-            return bpps_rnastructure_(sequence, tmp_file)
+            return bpps_rnastructure_(sequence, tmp_file, coaxial=coaxial)
         else:
             raise RuntimeError('package not yet implemented')
 
@@ -99,14 +110,14 @@ def bpps_nupack_(sequence, version='95', T=37, dangles=True):
     
     nupack_materials={'95': 'rna1995', '99': 'rna1999'}
 
-    DIR = settings.LOC['nupack']
+    DIR = package_locs['nupack']
 
     if dangles:
         dangle_option='some'
     else:
         dangle_option='none'
 
-    seqfile = utils.write([sequence])
+    seqfile = write([sequence])
 
     command=['%s/pairs' % DIR, '%s' % seqfile.replace('.in',''),
       '-T', str(T), '-material', nupack_materials[version], '-dangles', dangle_option]
@@ -136,13 +147,15 @@ def bpps_nupack_(sequence, version='95', T=37, dangles=True):
 
     return probs
 
-def bpps_rnastructure_(sequence, tmp_file):
+def bpps_rnastructure_(sequence, tmp_file, coaxial=True):
 
-    DIR = settings.LOC['rnastructure']
+    DIR = package_locs['rnastructure']
 
-    pfsfile = tmp_file #'%s/rnastructtmp.pfs' % settings.LOC['TMP']
-    outfile = '%s/rnastructtmp.probs' % settings.LOC['TMP']
+    pfsfile = tmp_file #'%s/rnastructtmp.pfs' % package_locs['TMP']
+    outfile = '%s/rnastructtmp.probs' % package_locs['TMP']
     command = ['%s/ProbabilityPlot' % DIR, pfsfile, outfile, '-t']
+    if not coaxial:
+        command.extend(['--disablecoax'])
     probs=np.zeros([len(sequence), len(sequence)])
 
     p = sp.Popen(command, stdout=sp.PIPE, stderr=sp.PIPE)
@@ -166,7 +179,7 @@ def bpps_rnastructure_(sequence, tmp_file):
 def bpps_vfold_(sequence, version='0',T=37, coaxial=True):
     #available versions: 0 for Turner 04 params, 1 for Mfold 2.3 params
 
-    DIR = settings.LOC["vfold_0"]
+    DIR = package_locs["vfold_0"]
 
     cwd = os.getcwd()
     os.chdir(DIR) #vfold precompiled binaries don't work being called from elsewhere

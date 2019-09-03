@@ -2,8 +2,7 @@ import os, re
 import subprocess as sp
 import random, string
 import numpy as np
-import settings
-
+import yaml, arnie
 
 def write_vector_to_file(vector, outfile):
   for x in vector:
@@ -164,7 +163,8 @@ def filename(n=6):
     n (int): number of characters
   """
   rand = ''.join([random.choice(string.ascii_lowercase) for _ in range(n)])
-  return '%s/%s' % (settings.LOC['TMP'], rand)
+  tmpdir = load_package_locations_from_yaml('user_default.yaml')['TMP']
+  return '%s/%s' % (tmpdir, rand)
 
 def write(lines, fname=None):
   """write lines to file
@@ -179,3 +179,30 @@ def write(lines, fname=None):
     for line in lines:
       f.write('%s\n' % line)
   return fname
+
+def load_package_locations_from_yaml(yaml_file):
+    package_path = os.path.dirname(arnie.__file__)
+    LOC = yaml.load(open("%s/%s" % (package_path, yaml_file)))
+    return LOC    
+
+#LOC={'rnastructure':	"/Users/hwayment/das/software/RNAstructure/exe",
+#	'rnasoft':	"/Users/hwayment/das/software/MultiRNAFold",
+	#'contrafold_1':	"",
+	#'contrafold_se':	"",
+#	'contrafold_2':	"/Users/hwayment/das/software/contrafold-se/src",
+#	'vienna_2':	"/usr/local/bin",
+	#'vienna_1':	"/Users/hwayment/das/software/ViennaRNA-1.8.5/bin", cryptic symbols(s) not found
+	#'nupack':		"/usr/local/bin", builds just fine but seems broken
+#	'vfold_0':	"/Users/hwayment/das/software/vfold/Vfold201409",
+#	'TMP':		"/Users/hwayment/das/tmp"}
+
+#sherlock
+#LOC={'rnastructure':	"/home/users/hannahw1/secstruct_software/RNAstructure/exe",
+# 	'rnasoft':	"/home/users/hannahw1/secstruct_software/MultiRNAFold",
+# 	'contrafold_1':	"/home/users/hannahw1/secstruct_software/contrafold_v1_10/src",
+# 	'contrafold_2':	"/home/users/hannahw1/secstruct_software/contrafold_v2_02/src",
+# 	'contrafold_se':	"/home/users/hannahw1/secstruct_software/contrafold-se/src",
+# 	'vienna_2':	"/home/users/hannahw1/secstruct_software/ViennaRNA-2.4.10/src/bin",
+# 	'vienna_1':	"/home/users/hannahw1/secstruct_software/ViennaRNA-1.8.5/bin",
+# 	'nupack':		"/home/users/hannahw1/secstruct_software/nupack3.2.2/build/bin",
+# 	'TMP':		"/scratch/users/hannahw1/tmp"}

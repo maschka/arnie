@@ -1,60 +1,61 @@
-import os, re, sys
+import os, re, sys, shutil
 import subprocess as sp
 import random, string
 import numpy as np
-from utils import *
-import settings
+from .utils import *
 
 DEBUG=False
+
+# load package locations from yaml file, watch! global dict
+package_locs = load_package_locations_from_yaml('user_default.yaml')
 
 def pfunc(seq, package='vienna_2', T=37,
     constraint=None, motif=None,
     dangles=True, noncanonical=False,
-    bpps=False, mfe=False, mea=False, param_file=None, coaxial=False):
-    """Get partition function structure representation and partition function,
-    wrapper for vienna, contrafold, rnastructure
+    bpps=False, mfe=False, mea=False, param_file=None, coaxial=True):
+    ''' Compute partition function for RNA sequence.
 
         Args:
         seq (str): nucleic acid sequence
-        T (float): temperature
+        T (float): temperature (Celsius)
         constraint (str): structure constraints
         motif (str): argument to vienna motif 
-        dangles(bool): dangles or not
+        dangles (bool): dangles or not, specifiable for vienna, nupack
+        coaxial (bool): coaxial stacking or not, specifiable for rnastructure, vfold
         noncanonical(bool): include noncanonical pairs or not (for contrafold, RNAstructure (Cyclefold))
 
-
         Possible packages: 
-        'vienna_2'
-        'vienna_1'
-        'contrafold_1'
-        'contrafold_2'
-        'contrafold_se'
-        'nupack_95'
-        'nupack_99'
+        'vienna_2', 'vienna_1','contrafold_1','contrafold_2','nupack_95','nupack_99','rnasoft_2007','rnasoft_1999','rnastructure','vfold_0','vfold_1'
         
     Returns
         str, float: secondary structure representation and free energy
-    """
+    '''
 
     try:
         pkg, version = package.lower().split('_')
     except:
         pkg, version = package, None
 
+    if not bpps: # if bpps, already printed these warnings
+        if not dangles and pkg not in ['vienna','nupack']:
+            print('Warning: %s does not support dangles options' % pkg)
+        if not coaxial and pkg not in ['rnastructure','vfold']:
+            print('Warning: %s does not support coaxial options' % pkg)
+
     if pkg=='vienna':
-        Z, tmp_file = pfunc_vienna_(seq, version=version, T=T, constraint=constraint, motif=motif, bpps=bpps)
+        Z, tmp_file = pfunc_vienna_(seq, version=version, T=T, dangles=dangles, constraint=constraint, motif=motif, bpps=bpps)
 
     elif pkg=='contrafold':
         Z, tmp_file = pfunc_contrafold_(seq, version=version, T=T, constraint=constraint, bpps=bpps, param_file=param_file)
 
     elif pkg=='rnastructure':
-        Z, tmp_file = pfunc_rnastructure_(seq, version=version, T=T, constraint=constraint, bpps=bpps)
+        Z, tmp_file = pfunc_rnastructure_(seq, version=version, T=T, coaxial=coaxial, constraint=constraint, bpps=bpps)
 
     elif pkg=='rnasoft':
         Z, tmp_file = pfunc_rnasoft_(seq, version=version, T=T, constraint=constraint, bpps=bpps)
 
     elif pkg=='nupack':
-        Z, tmp_file = pfunc_nupack_(seq, version=version, T=T)
+        Z, tmp_file = pfunc_nupack_(seq, version=version, dangles=dangles, T=T)
 
     elif pkg=='vfold':
         Z, tmp_file = pfunc_vfold_(seq, version=version, T=T, coaxial=coaxial)
@@ -87,9 +88,9 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None,
         version='2'
 
     if version.startswith('2'):
-        LOC=settings.LOC['vienna_2']
+        LOC=package_locs['vienna_2']
     elif version.startswith('1'):
-        LOC=settings.LOC['vienna_1']
+        LOC=package_locs['vienna_1']
     else:
         raise RuntimeError('Error, vienna version %s not present' % version)
 
@@ -126,7 +127,7 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None,
     free_energy = float(m.group(2))
 
     tmp_file= '%s.ps' % filename()
-    os.rename('dot.ps', tmp_file)
+    shutil.move('dot.ps', tmp_file)
 
     return np.exp(-1*free_energy/(.0019*(273+T))), tmp_file
 
@@ -147,11 +148,11 @@ def pfunc_contrafold_(seq, T=37, version='se', constraint=None, bpps=False,param
     fname = '%s.in' % filename()
 
     if version.startswith('2'):
-        LOC=settings.LOC['contrafold_2']
+        LOC=package_locs['contrafold_2']
     elif version.startswith('1'):
-        LOC=settings.LOC['contrafold_1']
+        LOC=package_locs['contrafold_1']
     elif version.startswith('se'):
-        LOC=settings.LOC['contrafold_se']
+        LOC=package_locs['contrafold_se']
     else:
         raise RuntimeError('Error, Contrafold version %s not present' % version)
 
@@ -197,7 +198,7 @@ def pfunc_contrafold_(seq, T=37, version='se', constraint=None, bpps=False,param
         return 0, posterior_fname
 
 def pfunc_rnasoft_(seq, version='99', T=37, constraint=None, bpps=False, mfe=False):
-    DIR = settings.LOC['rnasoft']
+    DIR = package_locs['rnasoft']
 
     if not version: version='99'
 
@@ -242,7 +243,7 @@ def pfunc_nupack_(seq, version='95', T=37, dangles=True):
     if not version: version='95'
     nupack_materials={'95': 'rna1995', '99': 'rna1999'}
 
-    DIR = settings.LOC['nupack']
+    DIR = package_locs['nupack']
 
     if dangles:
         dangle_option='some'
@@ -273,7 +274,7 @@ def pfunc_nupack_(seq, version='95', T=37, dangles=True):
 
     return Z, None
 
-def pfunc_rnastructure_(seq, version=None, T=37, constraint=None, bpps=False):
+def pfunc_rnastructure_(seq, version=None, T=37, constraint=None, coaxial=True,bpps=False):
     """get partition function structure representation and free energy
 
     Args:
@@ -281,14 +282,18 @@ def pfunc_rnastructure_(seq, version=None, T=37, constraint=None, bpps=False):
         T (float): temperature
         constraint (str): structure constraints
         motif (str): argument to vienna motif  
+        coaxial (bool): Coaxial stacking or not (default True)
     Returns
         float: partition function
     """
 
     seqfile = write([seq])
     pfsfile = '%s.pfs' % filename()
-    DIR = settings.LOC['rnastructure']
+    DIR = package_locs['rnastructure']
     command = ['%s/partition' % DIR, seqfile, pfsfile, '-T', str(T+273)]
+
+    if not coaxial:
+        command.extend(['--disablecoax'])
 
     if constraint is not None:
         fname = '%s.CON' % filename()
@@ -342,7 +347,7 @@ def pfunc_vfold_(seq, version='0', T=37, coaxial=True, bpps=False):
         # command = ['%s/Vfold2d_npk_mac.o %d %d %s %s %d' % (DIR, int(coaxial),\
         #  T, infile, outfile, int(version))]
 
-    DIR = settings.LOC["vfold_0"]
+    DIR = package_locs["vfold_0"]
 
     cwd = os.getcwd()
     os.chdir(DIR) #vfold precompiled binaries don't work being called from elsewhere
