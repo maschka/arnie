@@ -10,7 +10,7 @@ DEBUG=False
 # load package locations from yaml file, watch! global dict
 package_locs = load_package_locations_from_yaml('user_default.yaml')
 
-def bpps(sequence, package='vienna', constraint=None, T=37, coaxial=True, dangles=True):
+def bpps(sequence, package='vienna', constraint=None, T=37, coaxial=True, dangles=True,param_file=None):
     ''' Compute base pairing probability matrix for RNA sequence.
 
     Args:
@@ -42,7 +42,7 @@ def bpps(sequence, package='vienna', constraint=None, T=37, coaxial=True, dangle
     elif pkg=='vfold':
     	return bpps_vfold_(sequence, version = version, T = T, coaxial = coaxial)
     else:
-        _, tmp_file = pfunc(sequence, package=package, bpps=True, constraint=constraint, T=T, coaxial=coaxial, dangles=dangles)
+        _, tmp_file = pfunc(sequence, package=package, bpps=True, constraint=constraint, T=T, coaxial=coaxial, dangles=dangles, param_file=param_file)
         if 'contrafold' in package:
             return bpps_contrafold_(sequence, tmp_file)
         elif 'vienna' in package:

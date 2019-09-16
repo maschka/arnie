@@ -156,18 +156,17 @@ def pfunc_contrafold_(seq, T=37, version='se', constraint=None, bpps=False,param
     else:
         raise RuntimeError('Error, Contrafold version %s not present' % version)
 
-
-
     command = ['%s/contrafold' % LOC, 'predict', fname]
-
-    if param_file is not None:
-        command = command + ['--params %s' % param_file]
 
     if bpps:
         posterior_fname = '%s.posteriors' % filename()
         command = command + ['--posteriors', '0.001', posterior_fname]
     else:
         command.append('--partition')
+
+    if param_file is not None:
+        command = command + ['--params', param_file]
+
 
     if constraint is not None:
         convert_dbn_to_contrafold_input(seq, constraint, fname)
