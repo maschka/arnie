@@ -18,13 +18,15 @@ for pkg in ['vienna','contrafold','RNAsoft']:
 Compute base-pairing probability matrix:
 ```
 from arnie.bpps import bpps
-
+%pylab inline
 example_seq = 'GGGGAAAACCCC'
 
-Z={}
+bpps={}
 
 for pkg in ['vienna','contrafold','RNAsoft']:
-    Z[package] = bpps(example_seq, package=pkg)
+    bpps[package] = bpps(example_seq, package=pkg)
+    
+imshow(bpps['vienna'])
 ```
 
 Potentially helpful utilities in utils.py:
