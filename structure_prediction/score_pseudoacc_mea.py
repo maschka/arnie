@@ -125,7 +125,7 @@ def score_against_true_structs(pred_struct_list, true_struct_list, verbose=False
         raise ValueError('No predicted structure files found!')
 
     if len(true_struct_list) == 0:
-        raise ValueError('No predicted structure files found!')
+        raise ValueError('No ground truth structure files found!')
 
     for x in pred_struct_list:
         for s in true_struct_list:
@@ -203,7 +203,8 @@ if __name__ == '__main__':
          If flag not included, equal weight across constructs.')
 
     parser.add_argument('--verbose', dest='verbose', action='store_true')
-
+    parser.add_argument('--score_truth_only', dest='score_truth_only', action='store_true',
+        help='Use if MEA structures already generated and only scoring to ground truth dataset.')
 
     #print help and exit if no args
     if len(sys.argv)==1:
@@ -223,7 +224,8 @@ if __name__ == '__main__':
             print('Path to first true struct: %s' % args.true_structs[0])
         print('\nScanning gamma for MEA structure prediction:')
 
-    predict_MEA_structures(args.bp_matrices, gamma_min = args.gamma_min, gamma_max = args.gamma_max, verbose=args.verbose, metric = args.metric, output_dir = args.output_dir)
+    if not args.score_truth_only:
+        predict_MEA_structures(args.bp_matrices, gamma_min = args.gamma_min, gamma_max = args.gamma_max, verbose=args.verbose, metric = args.metric, output_dir = args.output_dir)
 
     if args.true_structs:
         if args.verbose: print('\nScoring provided true structures against maximum expected pseudoaccuracy structures:')

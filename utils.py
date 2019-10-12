@@ -2,7 +2,7 @@ import os, re
 import subprocess as sp
 import random, string
 import numpy as np
-import yaml, arnie
+import arnie
 
 def write_vector_to_file(vector, outfile):
   for x in vector:
@@ -66,22 +66,19 @@ def convert_dbn_to_contrafold_input(seq, constraints, filename):
   assert len(seq) == len(constraints)
 
   bp_list = convert_dotbracket_to_bp_list(constraints)
-
   with open('%s' % filename, 'w') as out:
-
+ 
     for i, (s, c) in enumerate(list(zip(seq, constraints))):
       if c=='x':
         constraint=0
       elif c=='.':
-        constraint=-1
+        constraint=0 #or -1 if undefined
       elif c in ['(',')']:
         constraint=bp_list[i]+1
       else:
         print('Error reading constraint string', c)
 
       out.write('%d\t%s\t%d\n'%(i+1, s, constraint))
-
-  out.close()
 
 def write_constraints(seq, MS2=False, LIG=False, lig1=('nAGGAUAU','(xxxxxx('), lig2=('AGAAGGn',')xxxxx)')):
   '''Inputs:
@@ -163,7 +160,7 @@ def filename(n=6):
     n (int): number of characters
   """
   rand = ''.join([random.choice(string.ascii_lowercase) for _ in range(n)])
-  tmpdir = load_package_locations_from_yaml('user_default.yaml')['TMP']
+  tmpdir = load_package_locations('user_default.yaml')['TMP']
   return '%s/%s' % (tmpdir, rand)
 
 def write(lines, fname=None):
@@ -180,10 +177,16 @@ def write(lines, fname=None):
       f.write('%s\n' % line)
   return fname
 
-def load_package_locations_from_yaml(yaml_file):
+def load_package_locations(yaml_file):
+    return_dct={}
     package_path = os.path.dirname(arnie.__file__)
-    LOC = yaml.load(open("%s/%s" % (package_path, yaml_file)))
-    return LOC    
+    with open("%s/%s" % (package_path, yaml_file,'r') as f:
+        for line in f.readlines():
+            if not line.startswith('#'):
+                key, string = line.strip().split(':')
+                string = string = string.strip()
+                return_dct[key] = string
+    return return_dct 
 
 #LOC={'rnastructure':	"/Users/hwayment/das/software/RNAstructure/exe",
 #	'rnasoft':	"/Users/hwayment/das/software/MultiRNAFold",

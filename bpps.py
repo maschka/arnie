@@ -8,7 +8,7 @@ from .pfunc import pfunc
 DEBUG=False
 
 # load package locations from yaml file, watch! global dict
-package_locs = load_package_locations_from_yaml('user_default.yaml')
+package_locs = load_package_locations('user_default.yaml')
 
 def bpps(sequence, package='vienna', constraint=None, T=37, coaxial=True, dangles=True,param_file=None):
     ''' Compute base pairing probability matrix for RNA sequence.
