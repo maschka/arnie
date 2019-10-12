@@ -3,7 +3,17 @@ Python API to compute RNA energetics and do structure prediction from all availa
 Das Lab, 2019
 Hannah Wayment-Steele
 
-Compute partition function example usage:
+
+##Usage:
+create a file that points to your builds of all the structure prediction packages you intend to make available.  An example file is provided in "user_default.yaml".  Create a variable in your .bashrc for this:
+
+```
+export ARNIEFILE="/path/to/arnie/<my_file.txt>"
+```
+NB: this file is technically yaml format, but isn't read in by yaml.
+
+
+##Compute partition function example usage:
 ```
 from arnie.pfunc import pfunc
 
@@ -15,7 +25,7 @@ for pkg in ['vienna','contrafold','RNAsoft']:
     Z[package] = pfunc(example_seq, package=pkg)
 ```
 
-Compute base-pairing probability matrix:
+##Compute base-pairing probability matrix:
 ```
 from arnie.bpps import bpps
 %pylab inline

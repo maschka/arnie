@@ -177,10 +177,11 @@ def write(lines, fname=None):
       f.write('%s\n' % line)
   return fname
 
-def load_package_locations(yaml_file):
+def load_package_locations():
+    '''Read in user-supplied file to specify paths to RNA folding packages. Specify this in your ~/.bashrc as $ARNIEFILE'''
     return_dct={}
     package_path = os.path.dirname(arnie.__file__)
-    with open("%s/%s" % (package_path, yaml_file,'r') as f:
+    with open("%s" % (os.environ["ARNIEFILE"],'r') as f:
         for line in f.readlines():
             if not line.startswith('#'):
                 key, string = line.strip().split(':')
