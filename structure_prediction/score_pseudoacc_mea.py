@@ -140,8 +140,6 @@ def score_against_true_structs(pred_struct_list, true_struct_list, verbose=False
         sen, ppv, mcc, fscore, N = score_ground_truth(pred_structs[i], true_structs[i])
         print('Score:\t%s\t%.3f\t%.3f\t%.3f\t%.3f' % (pdb_indices[i], sen, ppv, mcc, fscore))
 
-
-
         if weight_by_n_bps:
             ptl_sen += sen*N
             ptl_ppv += ppv*N

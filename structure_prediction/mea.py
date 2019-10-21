@@ -90,3 +90,13 @@ class MEA:
         fscore = 2*TP/(2*TP + FP - cFP + FN)
 
         return [sen, ppv, mcc, fscore]
+
+    def score_ground_truth(self, ground_truth_struct):
+        if len(ground_truth_struct[0])==1:
+            gt_matrix = convert_dotbracket_to_matrix(ground_truth_struct)
+        else:
+            gt_matrix = ground_truth_struct
+
+        if not self.evaluated: self.run_MEA()
+        sen, ppv, mcc, fscore, _ = score_ground_truth(self.MEA_bp_matrix, gt_matrix)
+        return [sen, ppv, mcc, fscore]

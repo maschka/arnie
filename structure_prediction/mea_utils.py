@@ -46,14 +46,14 @@ def score_ground_truth(pred_matrix, true_matrix):
 
     N = pred_matrix.shape[0]
     #print('pred',pred_matrix.shape, 'true', true_matrix.shape)
-#    assert pred_matrix.shape[1] == N
-#    assert true_matrix.shape[0] == N
-#    assert true_matrix.shape[1] == N
+    assert pred_matrix.shape[1] == N
+    assert true_matrix.shape[0] == N
+    assert true_matrix.shape[1] == N
 
     true = true_matrix[np.triu_indices(N)]
     pred = pred_matrix[np.triu_indices(N)]
 
-    TP, FP, cFP, TN, FN = 0,0,0,0,0
+    TP, FP, cFP, TN, FN = 0, 0, 0, 0, 0
 
     for i in range(len(true)):
         if true[i] == 1:
@@ -87,7 +87,7 @@ def score_ground_truth(pred_matrix, true_matrix):
 
     mcc_num = (TP*TN - (FP - cFP)*FN)
     mcc_denom = np.sqrt((TP + FP - cFP)*(TP + FN)*(TN + FP - cFP)*(TN + FN))
-    #print('mcc_num', mcc_num, 'mcc_denom',mcc_denom)
+
     if  mcc_denom == 0:
         mcc = mcc_num
     else:
