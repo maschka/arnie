@@ -72,7 +72,7 @@ def convert_dbn_to_contrafold_input(seq, constraints, filename):
       if c=='x':
         constraint=0
       elif c=='.':
-        constraint=0 #or -1 if undefined
+        constraint=-1 #or -1 if undefined
       elif c in ['(',')']:
         constraint=bp_list[i]+1
       else:
@@ -177,36 +177,30 @@ def write(lines, fname=None):
       f.write('%s\n' % line)
   return fname
 
+def print_available_packages():
+  package_dct = load_package_locations()
+  for key,v in package_dct.items():
+    if key != "TMP":
+      print(key,v)
+
+def package_list():
+  pkg_list=[]
+  package_dct = load_package_locations()
+  for key,v in package_dct.items():
+    if key != "TMP":
+      if v != "None":
+        pkg_list.append(key)
+  return pkg_list
+
 def load_package_locations():
     '''Read in user-supplied file to specify paths to RNA folding packages. Specify this in your ~/.bashrc as $ARNIEFILE'''
     return_dct={}
     package_path = os.path.dirname(arnie.__file__)
     with open("%s" % os.environ["ARNIEFILE"],'r') as f:
         for line in f.readlines():
-            if not line.startswith('#'):
-                key, string = line.strip().split(':')
-                string = string = string.strip()
+            if line.strip():
+              if not line.startswith('#'):
+                key, string = line.split(':')
+                string = string.strip()
                 return_dct[key] = string
-    return return_dct 
-
-#LOC={'rnastructure':	"/Users/hwayment/das/software/RNAstructure/exe",
-#	'rnasoft':	"/Users/hwayment/das/software/MultiRNAFold",
-	#'contrafold_1':	"",
-	#'contrafold_se':	"",
-#	'contrafold_2':	"/Users/hwayment/das/software/contrafold-se/src",
-#	'vienna_2':	"/usr/local/bin",
-	#'vienna_1':	"/Users/hwayment/das/software/ViennaRNA-1.8.5/bin", cryptic symbols(s) not found
-	#'nupack':		"/usr/local/bin", builds just fine but seems broken
-#	'vfold_0':	"/Users/hwayment/das/software/vfold/Vfold201409",
-#	'TMP':		"/Users/hwayment/das/tmp"}
-
-#sherlock
-#LOC={'rnastructure':	"/home/users/hannahw1/secstruct_software/RNAstructure/exe",
-# 	'rnasoft':	"/home/users/hannahw1/secstruct_software/MultiRNAFold",
-# 	'contrafold_1':	"/home/users/hannahw1/secstruct_software/contrafold_v1_10/src",
-# 	'contrafold_2':	"/home/users/hannahw1/secstruct_software/contrafold_v2_02/src",
-# 	'contrafold_se':	"/home/users/hannahw1/secstruct_software/contrafold-se/src",
-# 	'vienna_2':	"/home/users/hannahw1/secstruct_software/ViennaRNA-2.4.10/src/bin",
-# 	'vienna_1':	"/home/users/hannahw1/secstruct_software/ViennaRNA-1.8.5/bin",
-# 	'nupack':		"/home/users/hannahw1/secstruct_software/nupack3.2.2/build/bin",
-# 	'TMP':		"/scratch/users/hannahw1/tmp"}
+    return return_dct

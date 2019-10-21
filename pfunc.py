@@ -52,6 +52,8 @@ def pfunc(seq, package='vienna_2', T=37,
         Z, tmp_file = pfunc_rnastructure_(seq, version=version, T=T, coaxial=coaxial, constraint=constraint, bpps=bpps)
 
     elif pkg=='rnasoft':
+        if constraint is not None:
+            print("ERROR: RNAsoft is unable to handle constraints for calculating partition functions, returning unconstrained Z.")
         Z, tmp_file = pfunc_rnasoft_(seq, version=version, T=T, constraint=constraint, bpps=bpps)
 
     elif pkg=='nupack':
