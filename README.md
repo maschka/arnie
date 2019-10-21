@@ -1,7 +1,9 @@
 # arnie
 Python API to compute RNA energetics and do structure prediction from all available packages.
+
 Das Lab, 2019
-Hannah Wayment-Steele
+
+Hannah Wayment-Steele, greatly jumpstarted by Michelle Wu's `wuami_tools`
 
 
 ## Usage:
