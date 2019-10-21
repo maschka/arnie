@@ -33,7 +33,7 @@ def load_matrix_or_dbn(s):
     else:
         try: # load as dot-bracket string
 
-            dbn_struct = open("./%s" % s,'r').read().rstrip()
+            dbn_struct = open(s,'r').read().rstrip()
             
             struct = convert_dotbracket_to_matrix(dbn_struct)
         except:
