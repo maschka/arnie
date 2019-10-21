@@ -7,7 +7,7 @@ from .utils import *
 DEBUG=False
 
 # load package locations from yaml file, watch! global dict
-package_locs = load_package_locations('user_default.yaml')
+package_locs = load_package_locations()
 
 def pfunc(seq, package='vienna_2', T=37,
     constraint=None, motif=None,

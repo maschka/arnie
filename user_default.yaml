@@ -1,5 +1,4 @@
 # paths to local installations of packages.  If package is not installed, leave as None
-
 rnastructure: /home/users/hannahw1/secstruct_software/RNAstructure/exe
 rnasoft: /home/users/hannahw1/secstruct_software/MultiRNAFold
 contrafold_1: /home/users/hannahw1/secstruct_software/contrafold_v1_10/src

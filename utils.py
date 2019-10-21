@@ -160,7 +160,7 @@ def filename(n=6):
     n (int): number of characters
   """
   rand = ''.join([random.choice(string.ascii_lowercase) for _ in range(n)])
-  tmpdir = load_package_locations('user_default.yaml')['TMP']
+  tmpdir = load_package_locations()['TMP']
   return '%s/%s' % (tmpdir, rand)
 
 def write(lines, fname=None):
@@ -181,7 +181,7 @@ def load_package_locations():
     '''Read in user-supplied file to specify paths to RNA folding packages. Specify this in your ~/.bashrc as $ARNIEFILE'''
     return_dct={}
     package_path = os.path.dirname(arnie.__file__)
-    with open("%s" % (os.environ["ARNIEFILE"],'r') as f:
+    with open("%s" % os.environ["ARNIEFILE"],'r') as f:
         for line in f.readlines():
             if not line.startswith('#'):
                 key, string = line.strip().split(':')
