@@ -25,10 +25,12 @@ def convert_matrix_to_dotbracket(m):
     pass
 
 def load_matrix_or_dbn(s):
-    try:
+    num_lines = sum(1 for line in open(s))
+
+    if num_lines > 2: #heuristic here
         struct = np.loadtxt(s) # load as base pair matrix
         assert struct.shape[0] == struct.shape[1]
-    except:
+    else:
         try: # load as dot-bracket string
 
             dbn_struct = open("./%s" % s,'r').read().rstrip()
