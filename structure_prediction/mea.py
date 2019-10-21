@@ -1,6 +1,6 @@
 import numpy as np
 import argparse, sys
-from mea_utils import *
+from arnie.structure_prediction.mea_utils import *
 
 class MEA:
     def __init__(self, bpps, gamma = 1.0, debug=False):
@@ -15,6 +15,8 @@ class MEA:
         self.tb = np.zeros([self.N,self.N])
         self.min_hp_length=3
         self.evaluated = False
+
+        self.run_MEA()
         
     def fill_W(self, i, j):
         options = [self.W[i+1, j], self.W[i, j-1], (self.gamma+1)*self.bpps[i,j] + self.W[i+1, j-1] - 1,\

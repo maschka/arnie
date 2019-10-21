@@ -1,4 +1,4 @@
-from mea import *
+from arnie.structure_prediction.mea import *
 import numpy as np
 from glob import glob
 import argparse
@@ -7,23 +7,17 @@ import sys, os
 def predict_MEA_structures(matrix_list, gamma_min=-7, gamma_max=7, verbose=False, metric='mcc', output_dir='MEA_output'):
     '''Estimate maximum expected pseudoaccuracy structures per Hamada et al. BMC Bioinf 2010 11:586.
     
-    Note: Files in matrix_dir and true_structs need to have the same names corresponding
-        to their same constructs, but suffixes don't matter.
+    Note: Files in matrix_dir and true_structs need to have the same names corresponding to their same constructs, but suffixes don't matter.
         
     Inputs:
 
     matrix_dir: list of NxN base pair probability matrices.
-
     gamma_min, gamma_max: min/max log_2(gamma) value used, defaults are -7 and 7.
-
     metric: keyword-based, which metric to use to select structure. Options are 'sen', 'ppv', 'mcc', 'fscore'.
-
     verbose: print output or not (for command line use)
 
-
     Outputs:
-
-    List of predicted structures (in dbn format) at each gamma
+    List of predicted structures (in dbn format) at each gamma.
 
     '''
 
@@ -38,10 +32,8 @@ def predict_MEA_structures(matrix_list, gamma_min=-7, gamma_max=7, verbose=False
     n_constructs = len(matrices)
 
     gamma_vals = [x for x in range(gamma_min, gamma_max)]
-    best_metric_values = []
-    best_gammas = []
-    best_structs = []
-    best_metrics = []
+    best_metric_values, best_gammas, best_structs,best_metrics = [],[],[],[]
+
     metrics_across_gammas = {k:[] for k in gamma_vals}
 
     if verbose: print('\nmetric\tpdb_ind\tbest_log2g\tbest_metric_value\tbest_struct')
@@ -55,16 +47,16 @@ def predict_MEA_structures(matrix_list, gamma_min=-7, gamma_max=7, verbose=False
 
         for g in gamma_vals:
 
-            cls = MEA(matrix, gamma=2**g)
+            mea_cls = MEA(matrix, gamma=2**g)
 
-            metrics = cls.score_expected() #sen, ppv, mcc, fscore
+            metrics = mea_cls.score_expected() #sen, ppv, mcc, fscore
             metrics_across_gammas[g].append(metrics)
 
             if metrics[metric_ind] > running_best_value:
                 running_best_value = metrics[metric_ind]
                 running_best_metrics = metrics
                 running_best_gamma = g
-                running_best_struct = cls.structure
+                running_best_struct = mea_cls.structure
 
         best_metrics.append(running_best_metrics)
         best_metric_values.append(running_best_value)

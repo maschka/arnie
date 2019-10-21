@@ -12,7 +12,7 @@ package_locs = load_package_locations()
 def pfunc(seq, package='vienna_2', T=37,
     constraint=None, motif=None,
     dangles=True, noncanonical=False,
-    bpps=False, mfe=False, mea=False, param_file=None, coaxial=True):
+    bpps=False, param_file=None, coaxial=True):
     ''' Compute partition function for RNA sequence.
 
         Args:
@@ -28,13 +28,13 @@ def pfunc(seq, package='vienna_2', T=37,
         'vienna_2', 'vienna_1','contrafold_1','contrafold_2','nupack_95','nupack_99','rnasoft_2007','rnasoft_1999','rnastructure','vfold_0','vfold_1'
         
     Returns
-        str, float: secondary structure representation and free energy
+        float: free energy 
     '''
 
     try:
         pkg, version = package.lower().split('_')
     except:
-        pkg, version = package, None
+        pkg, version = package.lower(), None
 
     if not bpps: # if bpps, already printed these warnings
         if not dangles and pkg not in ['vienna','nupack']:
@@ -67,6 +67,7 @@ def pfunc(seq, package='vienna_2', T=37,
 
     if bpps:
         return Z, tmp_file
+
     else:
         if tmp_file:
             if os.path.exists(tmp_file):
@@ -133,7 +134,7 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None,
 
     return np.exp(-1*free_energy/(.0019*(273+T))), tmp_file
 
-def pfunc_contrafold_(seq, T=37, version='se', constraint=None, bpps=False,param_file=None):
+def pfunc_contrafold_(seq, T=37, version='2', constraint=None, bpps=False, param_file=None):
     """get partition function structure representation and free energy
 
     Args:
@@ -144,8 +145,7 @@ def pfunc_contrafold_(seq, T=37, version='se', constraint=None, bpps=False,param
     Returns
         float: partition function
     """
-    if not version: version='se'
-
+    if not version: version='2'
 
     fname = '%s.in' % filename()
 
@@ -153,8 +153,6 @@ def pfunc_contrafold_(seq, T=37, version='se', constraint=None, bpps=False,param
         LOC=package_locs['contrafold_2']
     elif version.startswith('1'):
         LOC=package_locs['contrafold_1']
-    elif version.startswith('se'):
-        LOC=package_locs['contrafold_se']
     else:
         raise RuntimeError('Error, Contrafold version %s not present' % version)
 
@@ -198,12 +196,12 @@ def pfunc_contrafold_(seq, T=37, version='se', constraint=None, bpps=False,param
     else:
         return 0, posterior_fname
 
-def pfunc_rnasoft_(seq, version='99', T=37, constraint=None, bpps=False, mfe=False):
+def pfunc_rnasoft_(seq, version='99', T=37, constraint=None, bpps=False):
     DIR = package_locs['rnasoft']
 
     if not version: version='99'
 
-    if mfe: print('rnasoft mfe not implemented yet') #simfold instead of simfold pf
+    #note for mfe will use simfold instead of simfold pf
 
     # supported versions: 07, 99, 99-no-dangles, BL-no-dangles, BLstar, LAM-CG, NOM-CG
     param_locs = {'07': '%s/params/CG_best_parameters_ISMB2007.txt' % DIR,
