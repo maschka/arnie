@@ -39,11 +39,9 @@ for pkg in ['vienna','contrafold','RNAsoft']:
 imshow(bpps['vienna'])
 ```
 
-Potentially helpful utilities in utils.py:
+## Riboswitch fold change:
 
-`write_constraints(seq, MS2=False, LIG=True)`: 
-for riboswitches, write constraint string to then feed into contrafold or vienna to compute constrained partition functions.
-I.E. for the three constrained states of a riboswitch, would do `MS2=False, LIG=True,`, `MS2=True, LIG=False`, `MS2=True, LIG=True`.
+See `examples/riboswitch_fold_change.ipynb` for example k_d prediction and fold change prediction.
 
 ## Coming soon
 
