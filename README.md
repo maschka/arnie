@@ -5,6 +5,13 @@ Das Lab, 2019
 
 Hannah Wayment-Steele, with inspiration from MWu's `wuami_tools`
 
+## Organization:
+
+`examples`: example jupyter notebooks with usage.
+
+`scripts`: scripts for processing sequences in batch.
+
+`mea`: code for computing Maximum Expected Accuracy structures.
 
 ## Usage:
 create a file that points to your builds of all the structure prediction packages you intend to make available.  An example file is provided in "user_default.yaml".  Create a variable in your .bashrc for this:
