@@ -11,17 +11,20 @@ Hannah Wayment-Steele, with inspiration from MWu's `wuami_tools`
 
 `scripts`: scripts for processing sequences in batch.
 
+`test`: unit tests (still in work)
+
 `mea`: code for computing Maximum Expected Accuracy structures.
 
 ## Usage:
-create a file that points to your builds of all the structure prediction packages you intend to make available.  An example file is provided in "user_default.yaml".  Create a variable in your .bashrc for this:
+
+Start by creating a file that points to your builds of all the structure prediction packages you wish to use.  An example file is provided in `example_arnie_file.txt`.  Create a variable in your .bashrc for this:
 
 ```
 export ARNIEFILE="/path/to/arnie/<my_file.txt>"
 ```
 NB: this file is technically yaml format, but isn't read in by yaml.
 
-See `arnie_example.ipynb` for example syntax. In brief, comparing across packages is simple. For example, for computing base pairing probability matrices:
+See `examples/start_here.ipynb` for example syntax. In brief, comparing across packages is simple. For computing base pairing probability matrices:
 
 ```
 from arnie.bpps import bpps
