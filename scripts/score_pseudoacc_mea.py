@@ -1,4 +1,4 @@
-from arnie.structure_prediction.mea import *
+from arnie.mea.mea import *
 import numpy as np
 from glob import glob
 import argparse
