@@ -33,7 +33,7 @@ example_seq = 'GGGGAAAACCCC'
 
 bpps={}
 
-for pkg in ['vienna','contrafold','RNAsoft']:
+for pkg in ['vienna','nupack','RNAstructure','contrafold','RNAsoft']:
     bpps[package] = bpps(example_seq, package=pkg)
     
 imshow(bpps['vienna'])
