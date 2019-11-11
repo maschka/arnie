@@ -62,23 +62,42 @@ def convert_dbn_to_RNAstructure_input(seq, constraints, filename):
       out.write('%d %d\n' % (x,y))
     out.write('-1 -1')
 
-def convert_dbn_to_contrafold_input(seq, constraints, filename):
+def write_constraint_string(seq, constraint_dbn):
+  '''write set of integers to represent constraints, i.e. for use in bpseq format.'''
+
   assert len(seq) == len(constraints)
 
   bp_list = convert_dotbracket_to_bp_list(constraints)
-  with open('%s' % filename, 'w') as out:
- 
-    for i, (s, c) in enumerate(list(zip(seq, constraints))):
-      if c=='x':
-        constraint=0
-      elif c=='.':
-        constraint=-1 #or -1 if undefined
-      elif c in ['(',')']:
-        constraint=bp_list[i]+1
-      else:
-        print('Error reading constraint string', c)
 
-      out.write('%d\t%s\t%d\n'%(i+1, s, constraint))
+  constraint_list = []
+
+  for i, c in enumerate(constraints):
+        if c=='x':
+          constraint=0
+        elif c=='.':
+          constraint=-1 #or -1 if undefined
+        elif c in ['(',')']:
+          constraint=bp_list[i]+1
+        else:
+          print('Error reading constraint string', c)
+        constraint_list.append(constraint)
+  return constraint_list
+
+def convert_dbn_to_contrafold_input(seq, constraints, filename):
+  constraint_list = write_constraint_string(seq, constraints)
+  with open('%s' % filename, 'w') as out:
+    for i in range(len(seq)):
+    out.write('%d\t%s\t%d\n'%(i+1, seq[i], constraint_list[i]))
+
+def convert_multiple_dbns_to_eternafold_input(seq, list_of_constraint_strings, filename):
+  '''hard-coded to have 3 constraints right now for use in eternafold training with kd-ligand data.'''
+  constraint_lists=[]
+  for constraint_string in list_of_constraint_strings:
+    constraint_lists.append(write_constraint_string(constraint_string))
+    
+  with open('%s' % filename, 'w') as out:
+    for i in range(len(seq)):
+    out.write('%d\t%s\t%d\t%d\t%d\n' % (i+1, seq[i], constraint_list[0][i], constraint_list[1][i], constraint_list[2][i]))
 
 def write_constraints(seq, MS2=False, LIG=False, lig1=('nAGGAUAU','(xxxxxx('), lig2=('AGAAGGn',')xxxxx)')):
   '''Inputs:
