@@ -222,11 +222,11 @@ def write_combo_constraints(seq, raw_apt_seq, raw_apt_ss, verbose=False):
 
   Args:
     seq: RNA sequence
-    raw_apt_seq: list of aptamer sequences
-      e.g. ['CCC+GGG','AAUU', ...]
+    raw_apt_seq: aptamer sequence
+      e.g. CAAAG+CAAAG+GGCCUUUUGGCC
       + denotes splitable aptamer
-    raw_apt_ss: list of aptamer secondary structure
-      e.g. ['(((+)))','(xx)', ...]
+    raw_apt_ss: aptamer secondary structure
+      e.g. (xxx(+)xxx)+((((xxxx))))
       + denotes splitable aptamer
       x denotes unpaired base
       . denotes wildcard (can be anything)
