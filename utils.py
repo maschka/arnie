@@ -213,8 +213,7 @@ def combo_list_to_dbn_list(seq, final_combo_list, apt_idx_list, apt_ss_list):
       dbn_string = dbn_string.replace('(','?')
       dbn_string = dbn_string.replace(')','(')
       dbn_string = dbn_string.replace('?',')')
-    if '()' not in dbn_string and len(dbn_string) > 0: # Check for impossible basepairs
-      dbn_string_list.append(dbn_string)
+    dbn_string_list.append(dbn_string)
   return dbn_string_list
 
 def write_combo_constraints(seq, raw_apt_seq, raw_apt_ss, verbose=False):
@@ -232,12 +231,7 @@ def write_combo_constraints(seq, raw_apt_seq, raw_apt_ss, verbose=False):
       . denotes wildcard (can be anything)
     verbose: to be verbose
   Returns
-    list of list of secondary structure constraints
-      the 1st list corresponds to the 1st aptamer
-      the 2nd list corresponds to the 2nd aptamer
-      etc.
-    Will contains ss constraints for multiple copies as well
-    Will NOT return any constraints that contain ()
+    list of all possible dbn_string for the given aptamer
   """
   if verbose:
     print('Writing constraints')
