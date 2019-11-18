@@ -125,9 +125,13 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None,
     if p.returncode:
         raise Exception('RNAfold failed: on %s\n%s' % (seq, stderr))
     os.remove(fname)
-    m = re.search('([,|\(\.\)\]\[\{\}]+)\s+\[\s*(-*[0-9]+\.[0-9]+)', stdout.decode('utf-8'))
 
-    free_energy = float(m.group(2))
+    if 'omitting constraint' in stderr.decode('utf-8'):
+        free_energy = np.inf # Impossible structure
+    else:
+        m = re.search('([,|\(\.\)\]\[\{\}]+)\s+\[\s*(-*[0-9]+\.[0-9]+)', stdout.decode('utf-8'))
+
+        free_energy = float(m.group(2))
 
     tmp_file= '%s.ps' % filename()
     shutil.move('dot.ps', tmp_file)
@@ -144,6 +148,7 @@ def pfunc_contrafold_(seq, T=37, version='2', constraint=None, bpps=False, param
         motif (str): argument to vienna motif  
     Returns
         float: partition function
+        Note: If the constraint is impossible then Z wil be equal to the Z unconstrained
     """
     if not version: version='2'
 
@@ -184,7 +189,6 @@ def pfunc_contrafold_(seq, T=37, version='2', constraint=None, bpps=False, param
         print(stdout)
         print('stderr')
         print(stderr)
-
     if p.returncode:
         raise Exception('Contrafold failed: on %s\n%s' % (seq, stderr))
 
@@ -240,7 +244,7 @@ def pfunc_rnasoft_(seq, version='99', T=37, constraint=None, bpps=False):
 def pfunc_nupack_(seq, version='95', T=37, dangles=True):
 
     if not version: version='95'
-    nupack_materials={'95': 'rna1995', '99': 'rna1999'}
+    nupack_materials={'95': 'rna1995', '99': 'rna1999', 'dna':'dna1998'}
 
     DIR = package_locs['nupack']
 

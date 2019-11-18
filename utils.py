@@ -34,7 +34,7 @@ def convert_dotbracket_to_bp_list(s):
     return m
 
 def convert_dbn_to_RNAstructure_input(seq, constraints, filename):
-  assert len(seq) == len(constraints)
+  assert(len(seq) == len(constraints))
 
   bp_list = convert_dotbracket_to_bp_list(constraints)
 
@@ -65,13 +65,13 @@ def convert_dbn_to_RNAstructure_input(seq, constraints, filename):
 def write_constraint_string(seq, constraint_dbn):
   '''write set of integers to represent constraints, i.e. for use in bpseq format.'''
 
-  assert len(seq) == len(constraints)
+  assert(len(seq) == len(constraint_dbn))
 
-  bp_list = convert_dotbracket_to_bp_list(constraints)
+  bp_list = convert_dotbracket_to_bp_list(constraint_dbn)
 
   constraint_list = []
 
-  for i, c in enumerate(constraints):
+  for i, c in enumerate(constraint_dbn):
         if c=='x':
           constraint=0
         elif c=='.':
@@ -87,7 +87,7 @@ def convert_dbn_to_contrafold_input(seq, constraints, filename):
   constraint_list = write_constraint_string(seq, constraints)
   with open('%s' % filename, 'w') as out:
     for i in range(len(seq)):
-    out.write('%d\t%s\t%d\n'%(i+1, seq[i], constraint_list[i]))
+      out.write('%d\t%s\t%d\n'%(i+1, seq[i], constraint_list[i]))
 
 def convert_multiple_dbns_to_eternafold_input(seq, list_of_constraint_strings, filename):
   '''hard-coded to have 3 constraints right now for use in eternafold training with kd-ligand data.'''
@@ -97,7 +97,7 @@ def convert_multiple_dbns_to_eternafold_input(seq, list_of_constraint_strings, f
     
   with open('%s' % filename, 'w') as out:
     for i in range(len(seq)):
-    out.write('%d\t%s\t%d\t%d\t%d\n' % (i+1, seq[i], constraint_list[0][i], constraint_list[1][i], constraint_list[2][i]))
+      out.write('%d\t%s\t%d\t%d\t%d\n' % (i+1, seq[i], constraint_list[0][i], constraint_list[1][i], constraint_list[2][i]))
 
 def write_constraints(seq, MS2=False, LIG=False, lig1=('nAGGAUAU','(xxxxxx('), lig2=('AGAAGGn',')xxxxx)')):
   '''Inputs:
