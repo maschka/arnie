@@ -33,6 +33,14 @@ def convert_dotbracket_to_bp_list(s):
                 break
     return m
 
+def convert_dotbracket_to_matrix(s):
+  matrix=np.zeros([len(s),len(s)])
+  bp_list = convert_dotbracket_to_bp_list(s)
+  for k,v in bp_list.items():
+    matrix[k,v] = 1
+  return matrix
+
+
 def convert_dbn_to_RNAstructure_input(seq, constraints, filename):
   assert(len(seq) == len(constraints))
 
