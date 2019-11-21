@@ -29,10 +29,9 @@ def free_energy(seq, structure=None, package='vienna_2', T=37, dangles=True):
         
     Returns
 		free energy (float)
-		structure (str): if not supplied this is the MFE structure
     '''
 
 	Z_unconstrained = pfunc(seq, package=package, T=T, dangles=dangles)
 	Z_constrained = pfunc(seq, package=package, T=T, dangles=dangles, constraint=structure)
 
-	return -0.0019899*(273+T) * np.log(Z_unconstrained-Z_constrained), structure # .00198 is k in kcal/mol
+	return -0.0019899*(273+T) * np.log(Z_unconstrained-Z_constrained) # .00198 is k in kcal/mol
