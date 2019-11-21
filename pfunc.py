@@ -43,7 +43,7 @@ def pfunc(seq, package='vienna_2', T=37,
             print('Warning: %s does not support coaxial options' % pkg)
 
     if pkg=='vienna':
-        Z, tmp_file = pfunc_vienna_(seq, version=version, T=T, dangles=dangles, constraint=constraint, motif=motif, bpps=bpps)
+        Z, tmp_file = pfunc_vienna_(seq, version=version, T=T, dangles=dangles, constraint=constraint, motif=motif, bpps=bpps, param_file=param_file)
 
     elif pkg=='contrafold':
         Z, tmp_file = pfunc_contrafold_(seq, version=version, T=T, constraint=constraint, bpps=bpps, param_file=param_file)
@@ -110,6 +110,9 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None,
 
     if not dangles:
         command.append('--dangles=0')
+
+    if param_file:
+        command.append('--paramFile=%s' % param_file)
 
     with open(fname) as f:
         if DEBUG: print(fname)
