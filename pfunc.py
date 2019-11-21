@@ -37,9 +37,9 @@ def pfunc(seq, package='vienna_2', T=37,
         pkg, version = package.lower(), None
 
     if not bpps: # if bpps, already printed these warnings
-        if not dangles and pkg not in ['vienna','nupack']:
+        if not dangles and pkg not in ['vienna', 'nupack']:
             print('Warning: %s does not support dangles options' % pkg)
-        if not coaxial and pkg not in ['rnastructure','vfold']:
+        if not coaxial and pkg not in ['rnastructure', 'vfold']:
             print('Warning: %s does not support coaxial options' % pkg)
 
     if pkg=='vienna':
@@ -104,6 +104,7 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None,
     if constraint is not None:
         fname = write([seq, constraint])
         command.append('-C')
+        command.append('--enforceConstraint')
     else:
         fname = write([seq])
 
@@ -132,11 +133,12 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None,
         m = re.search('([,|\(\.\)\]\[\{\}]+)\s+\[\s*(-*[0-9]+\.[0-9]+)', stdout.decode('utf-8'))
 
         free_energy = float(m.group(2))
+        if DEBUG: print('free_energy: ', free_energy)
 
     tmp_file= '%s.ps' % filename()
     shutil.move('dot.ps', tmp_file)
 
-    return np.exp(-1*free_energy/(.0019*(273+T))), tmp_file
+    return np.exp(-1*free_energy/(.0019899*(273+T))), tmp_file
 
 def pfunc_contrafold_(seq, T=37, version='2', constraint=None, bpps=False, param_file=None):
     """get partition function structure representation and free energy

@@ -2,7 +2,7 @@ import os, re, sys, shutil
 import subprocess as sp
 import random, string
 import numpy as np
-from utils import *
+from .utils import *
 
 DEBUG=False
 
@@ -10,7 +10,7 @@ DEBUG=False
 package_locs = load_package_locations()
 
 def sample_structures(seq, n_samples = 10, package='vienna_2', T=37, constraint=None, dangles=True):
-    ''' Draw stochastic sampled structures for RNA sequence.
+    ''' Draw stochastic sampled structures for RNA sequence. Possible packages: 'vienna_1', 'vienna_2'
 
         Args:
         seq (str): nucleic acid sequence
@@ -18,11 +18,7 @@ def sample_structures(seq, n_samples = 10, package='vienna_2', T=37, constraint=
         constraint (str): structure constraints
         motif (str): argument to vienna motif 
         dangles (bool): dangles or not, specifiable for vienna, nupack
-        coaxial (bool): coaxial stacking or not, specifiable for rnastructure, vfold
         noncanonical(bool): include noncanonical pairs or not (for contrafold, RNAstructure (Cyclefold))
-
-        Possible packages: 
-        'vienna_1', 'vienna_2'
         
     Returns
         list of structures
