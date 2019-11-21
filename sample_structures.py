@@ -40,7 +40,7 @@ def sample_structures(seq, n_samples = 10, package='vienna_2', T=37, constraint=
     else:
         raise ValueError('package %s either not understood or not supported at this moment.' % package)
 
-    return struct_list, energy_list, prob_list
+    return struct_list
 
 def sample_vienna_(seq, n_samples=10, T=37, version='2', constraint=None, dangles=True):
     """get partition function structure representation and Z
@@ -98,8 +98,8 @@ def sample_vienna_(seq, n_samples=10, T=37, version='2', constraint=None, dangle
         struct_list, prob_list, energy_list = [],[],[]
         output_lines = stdout.decode('utf-8').split('\n')[1:-1] # first line is just repeating sequence, last is empty space
         for line in output_lines:
-            struct_list.append(line.split(' ')[0])
+            struct_list.append(line.split(' ')[0].replace('.','x')) #explicitly converting .'s to x's here to maintain x=unpaired, .=unconstrained
             prob_list.append(float(line.split(' ')[-2]))
             energy_list.append(float(line.split(' ')[-1]))
 
-    return struct_list, prob_list, energy_list
+    return struct_list
