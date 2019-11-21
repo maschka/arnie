@@ -64,7 +64,7 @@ def sample_vienna_(seq, n_samples=10, T=37, version='2', constraint=None, dangle
     else:
         raise RuntimeError('Error, vienna version %s not present' % version)
 
-    command = ['%s/RNAsubopt' % LOC, '-T', str(T), '--stochBT_en=%d' % n_samples, '-N']
+    command = ['%s/RNAsubopt' % LOC, '-T', str(T), '--stochBT_en=%d' % n_samples]#, '-N']
 
     if constraint is not None:
         fname = write([seq, constraint])
