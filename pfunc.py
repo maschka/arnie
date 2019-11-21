@@ -74,7 +74,7 @@ def pfunc(seq, package='vienna_2', T=37,
                 os.remove(tmp_file)
         return Z
 
-def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None,
+def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_file=None,
                                     dangles=True, bpps=False):
     """get partition function structure representation and Z
 
