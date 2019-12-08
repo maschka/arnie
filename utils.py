@@ -14,6 +14,10 @@ def write_matrix_to_file(matrix, outfile):
     outfile.write('\t'.join(['%.3f' % y for y in x])+'\n')
   return
 
+def complement_to_(string):
+        base_pairing_dct = {'a':'u', 'u':'a', 'g':'c', 'c':'g'}
+        return ''.join(base_pairing_dct[x] for x in string[::-1])
+
 def convert_dotbracket_to_bp_list(s):
     m = {}
     bp1=[]
@@ -101,7 +105,7 @@ def convert_multiple_dbns_to_eternafold_input(seq, list_of_constraint_strings, f
   '''hard-coded to have 3 constraints right now for use in eternafold training with kd-ligand data.'''
   constraint_lists=[]
   for constraint_string in list_of_constraint_strings:
-    constraint_lists.append(write_constraint_string(constraint_string))
+    constraint_lists.append(write_constraint_string(seq, constraint_string))
     
   with open('%s' % filename, 'w') as out:
     for i in range(len(seq)):
