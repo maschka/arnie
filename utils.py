@@ -103,9 +103,9 @@ def convert_dbn_to_contrafold_input(seq, constraints, filename):
 
 def convert_multiple_dbns_to_eternafold_input(seq, list_of_constraint_strings, filename):
   '''hard-coded to have 3 constraints right now for use in eternafold training with kd-ligand data.'''
-  constraint_lists=[]
+  constraint_list=[]
   for constraint_string in list_of_constraint_strings:
-    constraint_lists.append(write_constraint_string(seq, constraint_string))
+    constraint_list.append(write_constraint_string(seq, constraint_string))
     
   with open('%s' % filename, 'w') as out:
     for i in range(len(seq)):
