@@ -12,7 +12,7 @@ package_locs = load_package_locations()
 def pfunc(seq, package='vienna_2', T=37,
     constraint=None, motif=None,
     dangles=True, noncanonical=False,
-    bpps=False, param_file=None, coaxial=True):
+    bpps=False, param_file=None, coaxial=True, reweight=None,return_free_energy = False):
     ''' Compute partition function for RNA sequence.
 
         Args:
@@ -43,8 +43,9 @@ def pfunc(seq, package='vienna_2', T=37,
             print('Warning: %s does not support coaxial options' % pkg)
 
     if pkg=='vienna':
-        Z, tmp_file = pfunc_vienna_(seq, version=version, T=T, dangles=dangles, constraint=constraint, motif=motif, bpps=bpps, param_file=param_file)
-
+        Z, tmp_file = pfunc_vienna_(seq, version=version, T=T, dangles=dangles, constraint=constraint, 
+            motif=motif, bpps=bpps, param_file=param_file,reweight=reweight, return_free_energy=return_free_energy)
+ 
     elif pkg=='contrafold':
         Z, tmp_file = pfunc_contrafold_(seq, version=version, T=T, constraint=constraint, bpps=bpps, param_file=param_file)
 
@@ -75,7 +76,7 @@ def pfunc(seq, package='vienna_2', T=37,
         return Z
 
 def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_file=None,
-                                    dangles=True, bpps=False):
+                                    dangles=True, bpps=False, reweight=None, return_free_energy=False):
     """get partition function structure representation and Z
 
     Args:
@@ -110,6 +111,9 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_fil
 
     if not dangles:
         command.append('--dangles=0')
+        
+    if reweight is not None:
+        command.append('--commands=%s' % reweight)
 
     if param_file:
         command.append('--paramFile=%s' % param_file)
@@ -141,7 +145,10 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_fil
     tmp_file= '%s.ps' % filename()
     shutil.move('dot.ps', tmp_file)
 
-    return np.exp(-1*free_energy/(.0019899*(273+T))), tmp_file
+    if return_free_energy:
+        return free_energy, tmp_file
+    else: # return Z
+        return np.exp(-1*free_energy/(.0019899*(273+T))), tmp_file
 
 def pfunc_contrafold_(seq, T=37, version='2', constraint=None, bpps=False, param_file=None):
     """get partition function structure representation and free energy
