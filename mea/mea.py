@@ -1,6 +1,6 @@
 import numpy as np
 import argparse, sys
-from arnie.structure_prediction.mea_utils import *
+from arnie.mea.mea_utils import *
 
 class MEA:
     def __init__(self, bpps, gamma = 1.0, debug=False):
