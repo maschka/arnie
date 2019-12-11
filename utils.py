@@ -111,9 +111,10 @@ def convert_multiple_dbns_to_eternafold_input(seq, list_of_constraint_strings, f
     for i in range(len(seq)):
       out.write('%d\t%s\t%d\t%d\t%d\n' % (i+1, seq[i], constraint_list[0][i], constraint_list[1][i], constraint_list[2][i]))
 
-def write_constraints(seq, MS2=False, LIG=False, lig1=('nAGGAUAU','(xxxxxx('), lig2=('AGAAGGn',')xxxxx)')):
+def write_constraints(seq, motif=False, MS2=False, LIG=False, lig1=('nAGGAUAU','(xxxxxx('), lig2=('AGAAGGn',')xxxxx)')):
   '''Inputs:
   seq: RNA sequence
+  motif: tuple (seq, struct) of motif. For example: PUM would be motif=('UGUAUAUA','xxxxxxxx').
   MS2: bool, whether to include MS2 constraint or not
   lig1: tuple (seq, struct) for 5' portion of ligand aptamer. Default is FMN.
   lig2: tuple (seq, struct) for 3' portion of ligand aptamer
@@ -131,6 +132,12 @@ def write_constraints(seq, MS2=False, LIG=False, lig1=('nAGGAUAU','(xxxxxx('), l
   bp_list={}
 
   dbn_string=['.']*len(seq)
+
+  if motif:
+    if LIG:
+      raise ValueError('Sorry, due to some hacky hard-coding, cannot handle both motif and LIG inputs at this time.')
+    else:
+      return write_constraints(seq,LIG=True, lig1=motif,lig2=('',''))
 
   if LIG:
       if seq.find(LIG_apt1) == -1:
@@ -229,7 +236,7 @@ def combo_list_to_dbn_list(seq, final_combo_list, apt_idx_list, apt_ss_list):
   return dbn_string_list
 
 def write_combo_constraints(seq, raw_apt_seq, raw_apt_ss, verbose=False):
-  """ Given a sequence it will give all possible secondary constraints of the aptamer 
+  """ Given a sequence, get all possible secondary constraints of the aptamer 
 
   Args:
     seq: RNA sequence
