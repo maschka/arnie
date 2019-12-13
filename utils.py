@@ -194,6 +194,32 @@ def prune_combo_list(combo_list, apt_idx_list, N_frag):
   final_combo_list = combo_list[final_idx_list]
   return np.array(final_combo_list)
 
+def flip_ss(ss):
+  """ Flips a secondary structure 
+  Only flips the unpaired bases
+  e.g. (.((....))....( ->
+       ).((....))....)
+  """
+  bp_list = []
+  unmatch_list = []
+  ss = list(ss)
+  for idx, c in enumerate(ss):
+    if c == '(':
+      bp_list.append(idx)
+    elif c == ')':
+      if len(bp_list):
+        bp_list.pop()
+      else:
+        unmatch_list.append(idx)
+  unmatch_list += bp_list
+  for idx in unmatch_list:
+    if ss[idx] == '(':
+      ss[idx] = ')'
+    else:
+      ss[idx] = '('
+  ss = ''.join(ss)
+  return ss
+
 def combo_list_to_dbn_list(seq, final_combo_list, apt_idx_list, apt_ss_list):
   """ Helper function for write_constraints 
   Converts the combination of aptamer fragments to dbn strings
@@ -208,11 +234,9 @@ def combo_list_to_dbn_list(seq, final_combo_list, apt_idx_list, apt_ss_list):
       dbn_string[start:finish] = list(apt_ss)
     dbn_string = ''.join(dbn_string)
     
-    # Now look at the 1st parenthesis to see if aptamer is backwards
-    if dbn_string.find('(') > dbn_string.find(')'): # aptamer is reversed
-      dbn_string = dbn_string.replace('(','?')
-      dbn_string = dbn_string.replace(')','(')
-      dbn_string = dbn_string.replace('?',')')
+    # Check if aptamer is flipped
+    if temp[0,0] > temp[-1,0]:
+      dbn_string = flip_ss(dbn_string)
     dbn_string_list.append(dbn_string)
   return dbn_string_list
 
@@ -246,7 +270,7 @@ def write_combo_constraints(seq, raw_apt_seq, raw_apt_ss, verbose=False):
 
   # Iterate through each aptamer fragment and save its idx,
   apt_idx_list = []
-  for idx, (apt_seq, apt_ss)  in enumerate(zip(apt_seq_list, apt_ss_list)):
+  for idx, (apt_seq, apt_ss) in enumerate(zip(apt_seq_list, apt_ss_list)):
     if seq.find(apt_seq) == -1:
       raise ValueError("Aptamer segment {} not found".format(idx+1))
     if len(apt_seq) != len(apt_ss):
