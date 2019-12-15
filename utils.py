@@ -15,8 +15,8 @@ def write_matrix_to_file(matrix, outfile):
   return
 
 def complement_to_(string):
-        base_pairing_dct = {'a':'u', 'u':'a', 'g':'c', 'c':'g'}
-        return ''.join(base_pairing_dct[x] for x in string[::-1])
+        base_pairing_dct = {'a':'u', 'u':'a', 'g':'c', 'c':'g','t':'a'}
+        return ''.join(base_pairing_dct[x.lower()] for x in string[::-1])
 
 def convert_dotbracket_to_bp_list(s):
     m = {}
@@ -146,11 +146,11 @@ def write_constraints(seq, motif=False, MS2=False, LIG=False, lig1=('nAGGAUAU','
       else:
         if lig1[0].startswith('n'):
           start1 = seq.find(LIG_apt1) + len(LIG_apt1) - len(lig1[0])
-          if start1 < 1:
+          if start1 < 0: #hws: changed from 1, maybe wrong?
             start1 = seq.find(LIG_apt1,start1+len(lig1[0])+1) + len(LIG_apt1) - len(lig1[0])
         else:
           start1 = seq.find(LIG_apt1)
-          if start1 < 1:
+          if start1 < 0: #hws: changed from 1, maybe wrong?
             start1 = seq.find(LIG_apt1,start1+len(lig1[0])+1)
 
         finish1 = start1 + len(lig1[0])   
