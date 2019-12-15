@@ -215,7 +215,7 @@ def pfunc_contrafold_(seq, T=37, version='2', constraint=None, bpps=False, param
 def pfunc_rnasoft_(seq, version='99', T=37, constraint=None, bpps=False):
     DIR = package_locs['rnasoft']
 
-    if not version: version='99'
+    if not version: version='blstar'
 
     #note for mfe will use simfold instead of simfold pf
 

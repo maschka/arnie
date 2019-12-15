@@ -154,13 +154,19 @@ def bpps_rnastructure_(sequence, tmp_file, coaxial=True):
     pfsfile = tmp_file #'%s/rnastructtmp.pfs' % package_locs['TMP']
     outfile = '%s/rnastructtmp.probs' % package_locs['TMP']
     command = ['%s/ProbabilityPlot' % DIR, pfsfile, outfile, '-t']
-    if not coaxial:
-        command.extend(['--disablecoax'])
+
     probs=np.zeros([len(sequence), len(sequence)])
 
+    if DEBUG: print(' '.join(command))
     p = sp.Popen(command, stdout=sp.PIPE, stderr=sp.PIPE)
 
     stdout, stderr = p.communicate()
+
+    if DEBUG:
+        print('stdout')
+        print(stdout)
+        print('stderr')
+        print(stderr)
 
     if p.returncode:
         raise Exception('RNAstructure ProbabilityPlot failed: on %s\n%s' % (seq, stderr))
