@@ -105,7 +105,8 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_fil
     if constraint is not None:
         fname = write([seq, constraint])
         command.append('-C')
-        command.append('--enforceConstraint')
+        if version=='2':
+            command.append('--enforceConstraint')
     else:
         fname = write([seq])
 
