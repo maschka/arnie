@@ -152,7 +152,7 @@ def bpps_rnastructure_(sequence, tmp_file, coaxial=True):
     DIR = package_locs['rnastructure']
 
     pfsfile = tmp_file #'%s/rnastructtmp.pfs' % package_locs['TMP']
-    outfile = '%s/rnastructtmp.probs' % package_locs['TMP']
+    outfile = '%s.probs' % (tmp_file.replace('.pfs',''))
     command = ['%s/ProbabilityPlot' % DIR, pfsfile, outfile, '-t']
 
     probs=np.zeros([len(sequence), len(sequence)])
