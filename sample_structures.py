@@ -9,7 +9,8 @@ DEBUG=False
 # load package locations from yaml file, watch! global dict
 package_locs = load_package_locations()
 
-def sample_structures(seq, n_samples = 10, package='vienna_2', T=37, constraint=None, dangles=True, reweight=None):
+def sample_structures(seq, n_samples = 10, package='vienna_2', T=37, constraint=None, 
+	dangles=True, reweight=None, nonredundant=False):
     ''' Draw stochastic sampled structures for RNA sequence. Possible packages: 'vienna_1', 'vienna_2'
 
         Args:
@@ -35,14 +36,16 @@ def sample_structures(seq, n_samples = 10, package='vienna_2', T=37, constraint=
         print('Warning: %s does not support dangles options' % pkg)
 
     if pkg=='vienna':
-        struct_list = sample_vienna_(seq, n_samples=n_samples, version=version, T=T, dangles=dangles, constraint=constraint, reweight=reweight)
+        struct_list = sample_vienna_(seq, n_samples=n_samples, version=version, T=T, 
+        	dangles=dangles, constraint=constraint, reweight=reweight, nonredundant = nonredundant)
 
     else:
         raise ValueError('package %s either not understood or not supported at this moment.' % package)
 
     return struct_list
 
-def sample_vienna_(seq, n_samples=10, T=37, version='2', constraint=None, dangles=True, reweight=None):
+def sample_vienna_(seq, n_samples=10, T=37, version='2', constraint=None, 
+	dangles=True, reweight=None, nonredundant=False):
     """get partition function structure representation and Z
 
     Args:
@@ -75,6 +78,9 @@ def sample_vienna_(seq, n_samples=10, T=37, version='2', constraint=None, dangle
 
     if not dangles:
         command.append('--dangles=0')
+
+    if nonredundant:
+    	command.append('-N')
 
     if reweight is not None:
         command.append('--commands=%s' % reweight)

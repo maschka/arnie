@@ -98,7 +98,12 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_fil
     else:
         raise RuntimeError('Error, vienna version %s not present' % version)
 
-    command = ['%s/RNAfold' % LOC, '-T', str(T), '-p']
+    output_id = local_rand_filename()
+
+    command = ['%s/RNAfold' % LOC, '-T', str(T), '-p', '--id-prefix=%s' % output_id]
+
+    output_dot_ps_file = "%s_0001_dp.ps" % output_id
+
     if motif is not None:
         command.append('--motif="%s"' % motif)
 
@@ -134,6 +139,7 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_fil
     if p.returncode:
         raise Exception('RNAfold failed: on %s\n%s' % (seq, stderr))
     os.remove(fname)
+    os.remove("%s_0001_ss.ps" % output_id)
 
     if 'omitting constraint' in stderr.decode('utf-8'):
         free_energy = np.inf # Impossible structure
@@ -143,13 +149,12 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_fil
         free_energy = float(m.group(2))
         if DEBUG: print('free_energy: ', free_energy)
 
-    tmp_file= '%s.ps' % filename()
-    shutil.move('dot.ps', tmp_file)
+    #shutil.move('dot.ps', tmp_file)
 
     if return_free_energy:
-        return free_energy, tmp_file
+        return free_energy, output_dot_ps_file
     else: # return Z
-        return np.exp(-1*free_energy/(.0019899*(273+T))), tmp_file
+        return np.exp(-1*free_energy/(.0019899*(273+T))), output_dot_ps_file
 
 def pfunc_contrafold_(seq, T=37, version='2', constraint=None, bpps=False, param_file=None):
     """get partition function structure representation and free energy

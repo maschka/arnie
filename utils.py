@@ -141,7 +141,7 @@ def write_constraints(seq, motif=False, MS2=False, LIG=False, lig1=('nAGGAUAU','
 
   if LIG:
       if seq.find(LIG_apt1) == -1:
-        raise RuntimeError("ligand 5' aptamer domain not found")
+        raise RuntimeError("ligand 5' aptamer domain not found, %s" % seq)
 
       else:
         if lig1[0].startswith('n'):
@@ -166,7 +166,7 @@ def write_constraints(seq, motif=False, MS2=False, LIG=False, lig1=('nAGGAUAU','
 
   if MS2:
       if seq.find(MS2_apt) == -1:
-        raise RuntimeError("MS2 aptamer domain not found")
+        raise RuntimeError("MS2 aptamer domain not found: %s" %seq)
       else:
         start=seq.find(MS2_apt)
         finish=start+len(MS2_apt)
@@ -334,6 +334,15 @@ def get_missing_motif_bases(seq):
   #print(seq.find(FMN_apt2), b)
 
   return seq[a], seq[b]
+
+def local_rand_filename(n=6):
+  """generate random filename
+
+  Args:
+    n (int): number of characters
+  """
+  rand = ''.join([random.choice(string.ascii_lowercase) for _ in range(n)])
+  return rand
 
 def filename(n=6):
   """generate random filename
