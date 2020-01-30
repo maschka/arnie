@@ -98,11 +98,15 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_fil
     else:
         raise RuntimeError('Error, vienna version %s not present' % version)
 
-    output_id = local_rand_filename()
 
-    command = ['%s/RNAfold' % LOC, '-T', str(T), '-p', '--id-prefix=%s' % output_id]
+    command = ['%s/RNAfold' % LOC, '-T', str(T), '-p']
 
-    output_dot_ps_file = "%s_0001_dp.ps" % output_id
+    if version.startswith('2'):
+        output_id = local_rand_filename()
+        output_dot_ps_file = "%s_0001_dp.ps" % output_id
+        command.append('--id-prefix=%s' % output_id)
+    else:
+        output_dot_ps_file = 'dot.ps'
 
     if motif is not None:
         command.append('--motif="%s"' % motif)
@@ -139,7 +143,9 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_fil
     if p.returncode:
         raise Exception('RNAfold failed: on %s\n%s' % (seq, stderr))
     os.remove(fname)
-    os.remove("%s_0001_ss.ps" % output_id)
+
+    if version.startswith('2'):
+        os.remove("%s_0001_ss.ps" % output_id)
 
     if 'omitting constraint' in stderr.decode('utf-8'):
         free_energy = np.inf # Impossible structure
@@ -148,8 +154,6 @@ def pfunc_vienna_(seq, T=37, version='2', constraint=None, motif=None, param_fil
 
         free_energy = float(m.group(2))
         if DEBUG: print('free_energy: ', free_energy)
-
-    #shutil.move('dot.ps', tmp_file)
 
     if return_free_energy:
         return free_energy, output_dot_ps_file
