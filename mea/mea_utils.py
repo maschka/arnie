@@ -2,7 +2,6 @@ import numpy as np
 import argparse, sys
 
 def convert_dotbracket_to_matrix(s):
-    triu_inds = np.triu_indices(len(s))
     m = np.zeros([len(s),len(s)])
     for char_set in [['(',')'], ['[',']'],['{','}']]:
         bp1=[]
@@ -21,7 +20,7 @@ def convert_dotbracket_to_matrix(s):
     return m
 
 def convert_matrix_to_dotbracket(m):
-    print('not implemented yet! whoops.')
+    print('not implemented yet!')
     pass
 
 def load_matrix_or_dbn(s):

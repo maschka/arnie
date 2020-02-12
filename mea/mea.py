@@ -1,22 +1,27 @@
 import numpy as np
 import argparse, sys
 from arnie.mea.mea_utils import *
+from copy import copy
 
 class MEA:
-    def __init__(self, bpps, gamma = 1.0, debug=False):
+    def __init__(self, bpps, gamma = 1.0, debug=False, run_probknot_heuristic = False, theta=0):
         self.debug = debug
         self.bpps = bpps
         self.N=self.bpps.shape[0]
         self.gamma = gamma
+        self.theta = theta
         self.W = np.zeros([self.N,self.N])
         self.MEA_bp_list = []
         self.structure = ['.']*self.N
-        self.MEA_bp_matrix = np.zeros([self.N,self.N])
-        self.tb = np.zeros([self.N,self.N])
-        self.min_hp_length=3
+        self.MEA_bp_matrix = np.zeros([self.N, self.N])
+        self.tb = np.zeros([self.N, self.N])
+        self.min_hp_length = 3
         self.evaluated = False
 
-        self.run_MEA()
+        if run_probknot_heuristic:
+            self.run_ProbKnot()
+        else:
+            self.run_MEA()
         
     def fill_W(self, i, j):
         options = [self.W[i+1, j], self.W[i, j-1], (self.gamma+1)*self.bpps[i,j] + self.W[i+1, j-1] - 1,\
@@ -40,7 +45,33 @@ class MEA:
         
         self.structure = ''.join(self.structure)
         if not self.evaluated: self.evaluated = True
+
+    def run_ProbKnot(self):
+
+        #Threshknot step: filter out bps below cutoff theta
+        threshknot_filter = np.where(self.bpps <= self.theta)
+        filtered_bpps = copy(self.bpps)
+        filtered_bpps[threshknot_filter] = 0
+
+        output = np.zeros([self.N, self.N])
         
+        # ProbKnot heuristic part 1: get all base pairs where p(ij) == p_max(i)
+        output[np.where(self.bpps == np.max(self.bpps, axis=0))] = 1
+        
+        # ProbKnot heuristic part 2: get all base pairs where p(ij) == p_max(j)
+        self.MEA_bp_matrix = np.clip(output+np.transpose(output)-1,0,1)
+
+        for [i, j] in np.array(np.where(self.MEA_bp_matrix == 1)).T:
+            if np.abs(i - j) > 1:
+                if [j,i] not in self.MEA_bp_list:
+                    self.MEA_bp_list.append([i,j])
+                    self.structure[i] = '('
+                    self.structure[j] = ')'
+        print('Warning: formatting pseudoknotted dot-bracket structures not yet supported. Any pseudoknotted stems will only appear as parentheses (not brackets).')
+        self.structure = ''.join(self.structure)
+
+        if not self.evaluated: self.evaluated = True
+
     def traceback(self, i, j):
         if j <= i:
             return
@@ -68,7 +99,11 @@ class MEA:
          Returns: 
          pseudoexpected SEN, PPV, MCC, F-score'''
 
-        if not self.evaluated: self.run_MEA()
+        if not self.evaluated: 
+            if run_probknot_heuristic:
+                self.run_ProbKnot()
+            else:
+                self.run_MEA()
 
         pred_m = self.MEA_bp_matrix[np.triu_indices(self.N)]
         probs = self.bpps[np.triu_indices(self.N)]
@@ -91,7 +126,7 @@ class MEA:
 
         return [sen, ppv, mcc, fscore]
 
-    def score_ground_truth(self, ground_truth_struct):
+    def score_ground_truth(self, ground_truth_struct, allow_pseudoknots=False):
         if len(ground_truth_struct[0])==1:
             gt_matrix = convert_dotbracket_to_matrix(ground_truth_struct)
         else:
