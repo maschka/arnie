@@ -18,15 +18,23 @@ def complement_to_(string):
         base_pairing_dct = {'a':'u', 'u':'a', 'g':'c', 'c':'g','t':'a'}
         return ''.join(base_pairing_dct[x.lower()] for x in string[::-1])
 
-def convert_dotbracket_to_bp_list(s):
+def convert_dotbracket_to_bp_list(s, allow_pseudoknots=False):
     m = {}
     bp1=[]
     bp2=[]
+    bp1_pk=[]
+    bp2_pk=[]
     for i, char in enumerate(s):
         if char=='(':
             bp1.append(i)
         if char==')':
             bp2.append(i)
+        if allow_pseudoknots:
+            if char=='[':
+              bp1_pk.append(i)
+            if char==']':
+              bp2_pk.append(i)
+
     for i in list(reversed(bp1)):
         for j in bp2:
             if j > i:
@@ -35,11 +43,19 @@ def convert_dotbracket_to_bp_list(s):
 
                 bp2.remove(j)
                 break
+    for i in list(reversed(bp1_pk)):
+        for j in bp2_pk:
+            if j > i:
+                m[i]=j
+                m[j]=i
+
+                bp2_pk.remove(j)
+                break
     return m
 
-def convert_dotbracket_to_matrix(s):
+def convert_dotbracket_to_matrix(s, allow_pseudoknots=False):
   matrix=np.zeros([len(s),len(s)])
-  bp_list = convert_dotbracket_to_bp_list(s)
+  bp_list = convert_dotbracket_to_bp_list(s, allow_pseudoknots=allow_pseudoknots)
   for k,v in bp_list.items():
     matrix[k,v] = 1
   return matrix
